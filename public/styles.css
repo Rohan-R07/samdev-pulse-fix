@@ -507,6 +507,26 @@ section {
   background: linear-gradient(135deg, #282828 0%, #3c3836 100%);
 }
 
+.solarized-theme {
+  background: linear-gradient(135deg, #002b36 0%, #073642 100%);
+}
+
+.catppuccin-theme {
+  background: linear-gradient(135deg, #1e1e2e 0%, #313244 100%);
+}
+
+.rose-pine-theme {
+  background: linear-gradient(135deg, #191724 0%, #1f1d2e 100%);
+}
+
+.aurora-theme {
+  background: linear-gradient(135deg, #0b1020 0%, #162447 100%);
+}
+
+.midnight-sunset-theme {
+  background: linear-gradient(135deg, #1a1024 0%, #3b1d4f 100%);
+}
+
 .theme-swatch-group {
   display: flex;
   gap: 0.5rem;
