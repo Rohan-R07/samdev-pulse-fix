@@ -60,6 +60,14 @@ Options: `left` (default), `center`, `right`
 
 ---
 
+### Hide Trophies (Optional)
+
+```md
+![samdev-pulse](https://samdev-pulse.vercel.app/api/profile?username=YOUR_GITHUB_USERNAME&hide_trophies=true)
+```
+
+---
+
 ### Full Example
 
 ```md
@@ -169,7 +177,7 @@ npm install
 
 ```env
 GITHUB_TOKEN=your_github_personal_access_token
-DEFAULT_USERNAME=octocat
+DEFAULT_USERNAME=SamXop123
 PORT=3000
 NODE_ENV=development
 ```
@@ -183,7 +191,7 @@ npm run dev
 Visit:
 
 ```
-http://localhost:3000/api/profile?username=octocat
+http://localhost:3000/api/profile?username=SamXop123
 ```
 
 ---
