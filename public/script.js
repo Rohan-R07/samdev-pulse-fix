@@ -71,28 +71,43 @@
 
   /* Handles the update preview button click */
   function handleUpdateClick() {
-    if (!updateBtn) return;
+  if (!updateBtn) return;
 
-    updateBtn.disabled = true;
+  const username = usernameInput.value.trim();
+  const errorMsg = document.getElementById('username-error');
+
+  // Show validation message if username is empty
+  if (!username) {
+    if (errorMsg) {
+      errorMsg.style.display = 'block';
+      usernameInput.focus();
+    }
+    return; // Stop here — don't make API call
+  }
+
+  // Hide error if username is now filled
+  if (errorMsg) errorMsg.style.display = 'none';
+
+  updateBtn.disabled = true;
+  updateBtn.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+    </svg>
+    Updating...
+  `;
+
+  updatePreview();
+
+  setTimeout(() => {
+    updateBtn.disabled = false;
     updateBtn.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
       </svg>
-      Updating...
+      Update Preview
     `;
-
-    updatePreview();
-
-    setTimeout(() => {
-      updateBtn.disabled = false;
-      updateBtn.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-        </svg>
-        Update Preview
-      `;
-    }, 500);
-  }
+  }, 500);
+}
 
   /* Handles copy button click */
   async function handleCopyClick() {
@@ -139,7 +154,13 @@
   function setupRealTimeSync() {
     // Typing in username or leetcode fields updates snippet instantly
     if (usernameInput) {
-      usernameInput.addEventListener('input', updateSnippetOnly);
+      usernameInput.addEventListener('input', () => {
+        const errorMsg = document.getElementById('username-error');
+        if (errorMsg && usernameInput.value.trim()) {
+          errorMsg.style.display = 'none';
+        }
+        updateSnippetOnly();
+     });
     }
     if (leetcodeInput) {
       leetcodeInput.addEventListener('input', updateSnippetOnly);
@@ -172,7 +193,9 @@
     // Set up real-time snippet sync on every input change
     setupRealTimeSync();
 
-    updatePreview();
+    if (usernameInput && usernameInput.value.trim()) {
+      updateSnippetOnly();
+   }
   }
 
   // runs initialization when DOM is ready
