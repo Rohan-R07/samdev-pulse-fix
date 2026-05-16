@@ -56,18 +56,46 @@ router.get('/', async (req, res) => {
   logApiAccess(req).catch(err => console.error('Log failed:', err.message));
 
   const { theme, leetcode, align, hide_trophies } = req.query;
-  const username = req.query.username || DEFAULT_USERNAME;
+
+  // Sanitize and validate username before passing to GitHub API
+  // GitHub usernames: max 39 chars, alphanumeric and hyphens only, no leading/trailing hyphens
+  const rawUsername = req.query.username || '';
+  const usernameRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$|^[a-zA-Z0-9]$/;
+
+  let username;
+  if (!rawUsername) {
+    // No username provided — use default
+    username = DEFAULT_USERNAME;
+  } else if (!usernameRegex.test(rawUsername)) {
+    // Invalid username — return friendly SVG error instead of crashing
+    const errorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="120">
+      <rect width="600" height="120" rx="10" fill="#0d1117" />
+      <text x="300" y="50" font-family="Arial" font-size="16" fill="#f87171" text-anchor="middle" font-weight="bold">
+        ⚠ Invalid GitHub Username
+      </text>
+      <text x="300" y="78" font-family="Arial" font-size="12" fill="#8b949e" text-anchor="middle">
+        Usernames must be 1–39 characters, alphanumeric or hyphens only,
+      </text>
+      <text x="300" y="98" font-family="Arial" font-size="12" fill="#8b949e" text-anchor="middle">
+        and cannot start or end with a hyphen.
+      </text>
+    </svg>`;
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.status(400).send(errorSvg);
+  } else {
+    username = rawUsername;
+  }
 
   // theme (default is dark)
   setTheme(theme || 'dark');
 
   // check if LeetCode is explicitly disabled
   const leetcodeDisabled = leetcode === 'false';
- const shouldRenderLeetCode = Boolean(leetcode && !leetcodeDisabled);
+  const shouldRenderLeetCode = Boolean(leetcode && !leetcodeDisabled);
 
-const showRepositoryStats = !shouldRenderLeetCode;
+  const showRepositoryStats = !shouldRenderLeetCode;
 
-const hideTrophies = hide_trophies === 'true';
+  const hideTrophies = hide_trophies === 'true';
 
   // alignment
   const validAlignments = ['left', 'center', 'right'];
@@ -101,15 +129,16 @@ const hideTrophies = hide_trophies === 'true';
   const row2CardWidth = calculateCardWidth(2) - LAYOUT.cardGap / 2;
   const row2Height = 200;
 
- // Row 3: trophy row
-const row3Y = row2Y + row2Height + LAYOUT.cardGap;
-const row3Height = 165;
-const fullWidth = width - (LAYOUT.padding * 2);
+  // Row 3: trophy row
+  const row3Y = row2Y + row2Height + LAYOUT.cardGap;
+  const row3Height = 165;
+  const fullWidth = width - (LAYOUT.padding * 2);
 
-// Dynamic height
-const height = hideTrophies
-  ? row2Y + row2Height + LAYOUT.padding
-  : row3Y + row3Height + LAYOUT.padding;
+  // Dynamic height
+  const height = hideTrophies
+    ? row2Y + row2Height + LAYOUT.padding
+    : row3Y + row3Height + LAYOUT.padding;
+
   // Card 1: github activity
   const card1Title = 'GitHub Activity';
   const card1Stats = [
@@ -189,10 +218,8 @@ const height = hideTrophies
     repos: data.publicRepos || 0,
     stars: data.totalStars || 0,
     followers: data.followers || 0,
-    reviews:
-  contributionData?.totalReviews || 0,
+    reviews: contributionData?.totalReviews || 0,
   };
-
 
   // build SVG content
   const content = [
@@ -208,27 +235,23 @@ const height = hideTrophies
 
     // Row 1: stat cards
     renderCardWithStats({ x: calculateCardX(0, cardWidth), y: row1Y, width: cardWidth, height: cardHeight, title: card1Title, stats: card1Stats }),
-
     renderCardWithStats({ x: calculateCardX(1, cardWidth), y: row1Y, width: cardWidth, height: cardHeight, title: 'Streak Stats', stats: streakStats }),
-
     renderCardWithStats({ x: calculateCardX(2, cardWidth), y: row1Y, width: cardWidth, height: cardHeight, title: card3Title, stats: card3Stats }),
 
     // Row 2: contribution chart (left) + top languages donut (right)
     renderContributionChart({ x: LAYOUT.padding, y: row2Y, width: chartWidth, height: row2Height, title: 'Contribution Activity', data: chartData }),
-
     renderDonutChart({ x: LAYOUT.padding + chartWidth + LAYOUT.cardGap, y: row2Y, width: row2CardWidth, height: row2Height, title: 'Top Languages', data: topLanguages }),
 
     // Row 3: trophy row
-
-hideTrophies
-  ? ''
-  : renderTrophyRow({
-      x: LAYOUT.padding,
-      y: row3Y,
-      width: fullWidth,
-      height: row3Height,
-      data: trophyData
-    }),
+    hideTrophies
+      ? ''
+      : renderTrophyRow({
+          x: LAYOUT.padding,
+          y: row3Y,
+          width: fullWidth,
+          height: row3Height,
+          data: trophyData
+        }),
   ].join('\n');
 
   const svg = wrapSvg(content, width, height);
@@ -239,4 +262,3 @@ hideTrophies
 });
 
 export default router;
-
