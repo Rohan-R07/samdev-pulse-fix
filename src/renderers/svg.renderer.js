@@ -1,5 +1,21 @@
 // SVG Layout System
+// src/renderers/svg.renderer.js
 
+export function getColors() {
+  return {
+    background: '#0f172a',
+    cardBg: '#111827',
+    border: '#1f2937',
+
+    primaryText: '#f9fafb',
+    secondaryText: '#d1d5db',
+    mutedText: '#9ca3af',
+
+    success: '#22c55e',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+  };
+}
 import darkTheme from '../themes/dark.theme.js';
 import lightTheme from '../themes/light.theme.js';
 import draculaTheme from '../themes/dracula.theme.js';
@@ -161,9 +177,10 @@ export function renderStatItem({ x, y, label, value, icon, accentColor, showProg
   // dynamic font size based on value length
   const valueStr = String(value);
   let fontSize = 32;
-  if (valueStr.length > 10) fontSize = 18;
-  else if (valueStr.length > 7) fontSize = 22;
-  else if (valueStr.length > 5) fontSize = 26;
+  if (valueStr.length > 8) fontSize = 14;
+  else if (valueStr.length > 6) fontSize = 18;
+  else if (valueStr.length > 4) fontSize = 24;
+  
 
   let iconElement = '';
   if (icon) {
@@ -186,7 +203,7 @@ export function renderStatItem({ x, y, label, value, icon, accentColor, showProg
   return `
   <g>
     ${iconElement}
-    <text x="${x}" y="${y}" font-family="'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="${fontSize}" font-weight="700" fill="${colors.primaryText}">${value}</text>
+    <text x="${x}" y="${y}" font-family="'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="${fontSize}" font-weight="700" fill="${colors.primaryText}" textLength="${valueStr.length > 10 ? '90' : ''}" lengthAdjust="${valueStr.length > 10 ? 'spacingAndGlyphs' : ''}">${value}</text>
     <text x="${x}" y="${y + 20}" font-family="'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11" fill="${colors.mutedText}" letter-spacing="0.3">${label}</text>
     ${progressBar}
   </g>`;
