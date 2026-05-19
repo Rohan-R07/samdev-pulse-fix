@@ -957,10 +957,11 @@ section {
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .params-table table {
-  min-width: unset;
+  min-width: 500px;
   width: 100%;
   margin-top: 15px;
 }
@@ -1104,8 +1105,9 @@ td code {
 }
 
 @media (max-width: 768px) {
-  .profile-avatar {
-    max-width: 280px;
+.profile-avatar {
+    max-width: 240px;
+    width: 80%;     
     margin: 0 auto;
   }
 }
@@ -1302,10 +1304,11 @@ td code {
     font-size: 1.1rem;
   }
 
-  .usage-card .code-block {
+.usage-card .code-block {
     font-size: 0.9rem;
-    word-break: break-word;
     white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: anywhere; 
     overflow-x: auto;
   }
 
@@ -1327,10 +1330,18 @@ td code {
 @media (max-width: 480px) {
   .hero-cta .btn,
   .cta-buttons .btn {
-  width: 100%;
-  justify-content: center;
-}
+    width: 100%;
+    justify-content: center;
+  }
 
+  .copy-btn, 
+  .preview-update-row .btn {
+    width: auto !important;
+    display: inline-flex;
+  }
+  .preview-update-row {
+    justify-content: center;
+  }
   .preview-panel {
     padding: var(--spacing-lg);
   }
